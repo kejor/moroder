@@ -11,7 +11,7 @@ fn main() {
     let sink = Sink::try_new(&stream_handle).unwrap();
 
     // Add a dummy source of the sake of the example.
-    let source = Oscillator::triangle_wave(1440.0)
+    let source = Oscillator::sine_wave(1440.0)
         .take_duration(Duration::from_secs_f32(5.0))
         .amplify(0.2);
     // .take_duration(Duration::from_secs_f32(5.0))

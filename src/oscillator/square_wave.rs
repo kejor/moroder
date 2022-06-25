@@ -5,21 +5,21 @@ use rodio::Source;
 use crate::SAMPLE_RATE;
 
 #[derive(Clone, Debug)]
-pub struct SineWave {
+pub struct SquareWave {
     frequency: f32,
     num_sample: u32,
 }
 
-impl SineWave {
+impl SquareWave {
     pub fn new(frequency: f32) -> Self {
-        SineWave {
+        SquareWave {
             frequency,
             num_sample: 0,
         }
     }
 }
 
-impl Iterator for SineWave {
+impl Iterator for SquareWave {
     type Item = f32;
 
     #[inline]
@@ -32,11 +32,15 @@ impl Iterator for SineWave {
 
         self.num_sample = self.num_sample.wrapping_add(1);
 
-        Some(value.sin())
+        if value.sin() > 0.0 {
+            Some(1.0)
+        } else {
+            Some(-1.0)
+        }
     }
 }
 
-impl Source for SineWave {
+impl Source for SquareWave {
     #[inline]
     fn current_frame_len(&self) -> Option<usize> {
         None
@@ -55,35 +59,5 @@ impl Source for SineWave {
     #[inline]
     fn total_duration(&self) -> Option<Duration> {
         None
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use std::f32::consts::PI;
-
-    use rodio::Source;
-
-    use super::SineWave;
-
-    #[test]
-    fn sine_wave() {
-        let frequency = 1440.0;
-
-        let sine_wave = SineWave::new(frequency);
-        let sample_rate = sine_wave.sample_rate();
-
-        let mut n = 0;
-        for sample in sine_wave {
-            let expected_value = (2.0 * PI * frequency * n as f32 / sample_rate as f32).sin();
-
-            assert_eq!(expected_value, sample);
-
-            if n > 1000 {
-                break;
-            }
-
-            n = n + 1;
-        }
     }
 }
